@@ -1,0 +1,30 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: AddressCheckerNZ
+Globals:
+  Api:
+    EndpointConfiguration: REGIONAL
+
+Resources:
+  JavaLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: com.aioi.address.checker.StreamLambdaHandler::handleRequest
+      Runtime: java21
+      CodeUri: .
+      MemorySize: 512
+      Policies: AWSLambdaBasicExecutionRole
+      Timeout: 30
+      Events:
+        ProxyResource:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: any
+
+Outputs:
+  JavaLambdaApi:
+    Description: URL for application
+    Value: !Sub 'https://${address-checker}.execute-api.${AWS::Region}.amazonaws.com/Prod/ping'
+    Export:
+      Name: JavaLambdaApi
